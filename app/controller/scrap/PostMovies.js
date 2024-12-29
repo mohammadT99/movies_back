@@ -4,6 +4,7 @@ const cheerio = require("cheerio");
 const GetMoviesController = async (req, res) => {
   try {
     const { code } = req.body;
+    console.log("code ------------->>", code);
     const url = `https://www.imdb.com/title/${code}`;
 
     const { data } = await axios.get(url, {
@@ -64,6 +65,12 @@ const GetMoviesController = async (req, res) => {
     $(".ipc-chip-list__scroller a span").each((index, element) => {
       movieDetails.genres.push($(element).text().trim());
     });
+    movieDetails.labels = [];
+    $(
+      'li[data-testid="storyline-genres"].ipc-metadata-list-item__content-container ul li[class*="ipc-inline-list__item"] a'
+    ).each((index, element) => {
+      movieDetails.labels.push($(element).text().trim());
+    });
 
     // Extracting the Rotten Tomatoes score (if available)
     movieDetails.rottenTomatoesScore =
@@ -119,7 +126,11 @@ const GetMoviesController = async (req, res) => {
       .text()
       .trim();
     // Sending the response
-    res.json(movieDetails);
+    res.status(200).json({
+      msg: "Movie data fetched successfully",
+      data: movieDetails,
+    });
+    console.log(movieDetails);
   } catch (error) {
     console.error("Error fetching movie data:", error.message);
     res.status(500).json({ error: "Failed to fetch movie data" });
