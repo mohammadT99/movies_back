@@ -19,6 +19,10 @@ const GetMoviesController = async (req, res) => {
 
     // Extracting the title
     movieDetails.title = $(".hero__primary-text").text().trim() || "N/A";
+    movieDetails.cover =
+      $(".sc-9a2a0028-5 .sc-9a2a0028-7 .ipc-poster .ipc-media img").attr(
+        "src"
+      ) || "N/A";
 
     // Extracting the full rating
     const ratingElement = $('span[class*="sc-d541859f-"]');
@@ -48,6 +52,14 @@ const GetMoviesController = async (req, res) => {
       movieDetails.languages.push("N/A");
     }
 
+    movieDetails.MovieDuration = $(
+      'div[class*="ipc-html-content ipc-html-content--base"] .ipc-html-content-inner-div'
+    )
+      .text()
+      .trim();
+
+    // console.log("testtt->>>", movieDetails.MovieDuration); // Check what is being retrieved
+
     // Extracting the countries
     movieDetails.countries = [];
     $(
@@ -66,9 +78,7 @@ const GetMoviesController = async (req, res) => {
       movieDetails.genres.push($(element).text().trim());
     });
     movieDetails.labels = [];
-    $(
-      'li[data-testid="storyline-genres"].ipc-metadata-list-item__content-container ul li[class*="ipc-inline-list__item"] a'
-    ).each((index, element) => {
+    $(".ipc-chip-list__scroller a span").each((index, element) => {
       movieDetails.labels.push($(element).text().trim());
     });
 
@@ -130,7 +140,6 @@ const GetMoviesController = async (req, res) => {
       msg: "Movie data fetched successfully",
       data: movieDetails,
     });
-    console.log(movieDetails);
   } catch (error) {
     console.error("Error fetching movie data:", error.message);
     res.status(500).json({ error: "Failed to fetch movie data" });
